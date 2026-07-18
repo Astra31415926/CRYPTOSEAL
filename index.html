@@ -96,9 +96,48 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
 .flash-anim { animation: flash 0.3s ease-out; }
 .dropdown-menu { transform: translateY(-10px); opacity: 0; visibility: hidden; transition: all 0.2s ease; }
 .dropdown-menu.show { transform: translateY(0); opacity: 1; visibility: visible; }
-.pass-field { transition: all 0.2s ease; }
 .channel-lock-row { min-height: 22px; }
-textarea.password-mode { -webkit-text-security: disc; letter-spacing: 0.15em; }
+textarea.password-mode,
+textarea.text-masked { -webkit-text-security: disc; letter-spacing: 0.15em; }
+
+/* Кнопка-ключ і кнопка-замок біля кожного каналу (стиль запозичено з CryptoSnowQR) */
+.key-btn, .lock-btn {
+  width: 44px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.45);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+.key-btn svg, .lock-btn svg { width: 18px; height: 18px; }
+.key-btn:hover, .lock-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.key-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+.key-btn-r.active, .key-btn-r.locked { color: var(--r-color); border-color: rgba(255,0,77,0.55); box-shadow: 0 0 12px rgba(255,0,77,0.25); }
+.key-btn-g.active, .key-btn-g.locked { color: var(--g-color); border-color: rgba(0,255,65,0.55); box-shadow: 0 0 12px rgba(0,255,65,0.25); }
+.key-btn-b.active, .key-btn-b.locked { color: var(--b-color); border-color: rgba(0,136,255,0.55); box-shadow: 0 0 12px rgba(0,136,255,0.25); }
+.key-btn-r.locked { background: rgba(255,0,77,0.15); }
+.key-btn-g.locked { background: rgba(0,255,65,0.15); }
+.key-btn-b.locked { background: rgba(0,136,255,0.15); }
+
+.lock-btn-r:hover { color: var(--r-color); border-color: rgba(255,0,77,0.55); }
+.lock-btn-g:hover { color: var(--g-color); border-color: rgba(0,255,65,0.55); }
+.lock-btn-b:hover { color: var(--b-color); border-color: rgba(0,136,255,0.55); }
+
+/* Дванадцять кружечків пароля — заповнюються по мірі введення символів */
+.pin-row { min-height: 48px; }
+.pin-dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 210px; align-content: center; }
+.pin-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: transparent;
+  transition: all 0.15s ease;
+}
+.pin-dot-r.filled { background: var(--r-color); border-color: var(--r-color); box-shadow: 0 0 6px rgba(255,0,77,0.65); }
+.pin-dot-g.filled { background: var(--g-color); border-color: var(--g-color); box-shadow: 0 0 6px rgba(0,255,65,0.65); }
+.pin-dot-b.filled { background: var(--b-color); border-color: var(--b-color); box-shadow: 0 0 6px rgba(0,136,255,0.65); }
+.pin-hidden-input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 </style>
 </head>
 <body class="p-4 pb-6">
@@ -145,35 +184,38 @@ textarea.password-mode { -webkit-text-security: disc; letter-spacing: 0.15em; }
   <div class="p-4 space-y-3 flex-shrink-0">
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-600 rounded-full"></div>
-      <textarea id="r-text" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      <div class="channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <label class="flex items-center gap-1.5 text-[11px] text-zinc-400 cursor-pointer select-none shrink-0">
-          <input type="checkbox" id="r-encrypt-chk" class="w-3.5 h-3.5 accent-red-600">
-          <span data-i18n="encrypt_channel">🔒 Зашифрувати канал</span>
-        </label>
-        <input type="password" id="r-pass" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field hidden flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-red-600/30 text-xs outline-none focus:border-red-600/60">
+      <div class="flex items-stretch gap-2 pl-4">
+        <button type="button" id="r-key-btn" class="key-btn key-btn-r shrink-0" disabled aria-label="key"></button>
+        <textarea id="r-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
+      </div>
+      <div id="r-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
+        <div id="r-pin-dots" class="pin-dots"></div>
+        <input type="password" id="r-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
+        <button type="button" id="r-lock-btn" class="lock-btn lock-btn-r shrink-0" aria-label="confirm"></button>
       </div>
     </div>
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-600 rounded-full"></div>
-      <textarea id="g-text" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      <div class="channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <label class="flex items-center gap-1.5 text-[11px] text-zinc-400 cursor-pointer select-none shrink-0">
-          <input type="checkbox" id="g-encrypt-chk" class="w-3.5 h-3.5 accent-green-600">
-          <span data-i18n="encrypt_channel">🔒 Зашифрувати канал</span>
-        </label>
-        <input type="password" id="g-pass" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field hidden flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-green-600/30 text-xs outline-none focus:border-green-600/60">
+      <div class="flex items-stretch gap-2 pl-4">
+        <button type="button" id="g-key-btn" class="key-btn key-btn-g shrink-0" disabled aria-label="key"></button>
+        <textarea id="g-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
+      </div>
+      <div id="g-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
+        <div id="g-pin-dots" class="pin-dots"></div>
+        <input type="password" id="g-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
+        <button type="button" id="g-lock-btn" class="lock-btn lock-btn-g shrink-0" aria-label="confirm"></button>
       </div>
     </div>
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-full"></div>
-      <textarea id="b-text" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      <div class="channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <label class="flex items-center gap-1.5 text-[11px] text-zinc-400 cursor-pointer select-none shrink-0">
-          <input type="checkbox" id="b-encrypt-chk" class="w-3.5 h-3.5 accent-blue-600">
-          <span data-i18n="encrypt_channel">🔒 Зашифрувати канал</span>
-        </label>
-        <input type="password" id="b-pass" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field hidden flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-blue-600/30 text-xs outline-none focus:border-blue-600/60">
+      <div class="flex items-stretch gap-2 pl-4">
+        <button type="button" id="b-key-btn" class="key-btn key-btn-b shrink-0" disabled aria-label="key"></button>
+        <textarea id="b-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
+      </div>
+      <div id="b-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
+        <div id="b-pin-dots" class="pin-dots"></div>
+        <input type="password" id="b-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
+        <button type="button" id="b-lock-btn" class="lock-btn lock-btn-b shrink-0" aria-label="confirm"></button>
       </div>
     </div>
   </div>
@@ -259,7 +301,7 @@ textarea.password-mode { -webkit-text-security: disc; letter-spacing: 0.15em; }
       </div>
       <div class="flex items-start gap-2.5">
         <span class="font-bold text-orange-500">3</span>
-        <p id="step-2b">🔒 <b>Шифрування:</b> увімкніть чекбокс під потрібним каналом і введіть пароль — саме цей канал буде зашифровано окремим ключем.</p>
+        <p id="step-2b">🔒 <b>Шифрування:</b> натисніть на іконку ключа зліва від каналу, введіть пароль (до 12 символів) і натисніть на замочок — саме цей канал буде зашифровано окремим паролем.</p>
       </div>
       <div class="flex items-start gap-2.5">
         <span class="font-bold text-orange-500">4</span>
@@ -320,12 +362,21 @@ const els = {
   rScan: document.getElementById('r-text-scan'),
   gScan: document.getElementById('g-text-scan'),
   bScan: document.getElementById('b-text-scan'),
-  rChk: document.getElementById('r-encrypt-chk'),
-  gChk: document.getElementById('g-encrypt-chk'),
-  bChk: document.getElementById('b-encrypt-chk'),
   rPass: document.getElementById('r-pass'),
   gPass: document.getElementById('g-pass'),
   bPass: document.getElementById('b-pass'),
+  rKeyBtn: document.getElementById('r-key-btn'),
+  gKeyBtn: document.getElementById('g-key-btn'),
+  bKeyBtn: document.getElementById('b-key-btn'),
+  rLockBtn: document.getElementById('r-lock-btn'),
+  gLockBtn: document.getElementById('g-lock-btn'),
+  bLockBtn: document.getElementById('b-lock-btn'),
+  rPinRow: document.getElementById('r-pin-row'),
+  gPinRow: document.getElementById('g-pin-row'),
+  bPinRow: document.getElementById('b-pin-row'),
+  rPinDots: document.getElementById('r-pin-dots'),
+  gPinDots: document.getElementById('g-pin-dots'),
+  bPinDots: document.getElementById('b-pin-dots'),
   rDecryptBtn: document.getElementById('r-decrypt-btn'),
   gDecryptBtn: document.getElementById('g-decrypt-btn'),
   bDecryptBtn: document.getElementById('b-decrypt-btn'),
@@ -361,6 +412,26 @@ els.fCtx = els.freeze.getContext('2d', { willReadFrequently: true });
 els.viewfinder.className = "viewfinder-corners hidden";
 els.viewfinder.innerHTML = `<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>`;
 
+// === ІКОНКИ КЛЮЧА/ЗАМКА (стиль запозичено з CryptoSnowQR) ===
+const KEY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10.5 11.5 20 2m0 0h-5m5 0v5m-9 4.5L15 9"/></svg>`;
+const LOCK_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
+
+// 12 порожніх кружечків пароля на кожен канал
+['r', 'g', 'b'].forEach(key => {
+  const dotsEl = els[key + 'PinDots'];
+  const keyBtn = els[key + 'KeyBtn'];
+  if (keyBtn) keyBtn.innerHTML = KEY_ICON_SVG;
+  const lockBtn = els[key + 'LockBtn'];
+  if (lockBtn) lockBtn.innerHTML = LOCK_ICON_SVG;
+  if (dotsEl) {
+    for (let i = 0; i < 12; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'pin-dot pin-dot-' + key;
+      dotsEl.appendChild(dot);
+    }
+  }
+});
+
 // === 2. TRANSLATIONS ===
 const translations = {
   uk: {
@@ -370,7 +441,7 @@ const translations = {
     learn_more: "Як це працює",
     step1: "📝 <b>Створення:</b> введіть текст у червоне, зелене та синє поле (можна заповнити лише одне або два).",
     step2: "🎨 <b>Генерація:</b> кольоровий QR-код створюється автоматично на льоту під час введення.",
-    step2b: "🔒 <b>Шифрування:</b> увімкніть чекбокс під потрібним каналом і введіть пароль — саме цей канал буде зашифровано окремим ключем.",
+    step2b: "🔒 <b>Шифрування:</b> натисніть на іконку ключа зліва від каналу, введіть пароль (до 12 символів) і натисніть на замочок — саме цей канал буде зашифровано окремим паролем.",
     step3: "💾 <b>Збереження:</b> натисніть «Зберегти PNG», щоб завантажити зображення.",
     step4: "📷 <b>Сканування:</b> натисніть «Сканувати» → наведіть камеру на код або оберіть фото з галереї.",
     step4b: "🔑 <b>Розшифрування:</b> якщо канал зашифровано, під ним з'явиться поле пароля — введіть пароль і натисніть «Розшифрувати».",
@@ -385,8 +456,6 @@ const translations = {
     btn_save: "Зберегти PNG",
     placeholder: "Введіть текст...",
     encrypted_hint: "🔒 Введіть пароль і натисніть «Розшифрувати»",
-    encrypt_channel: "🔒 Зашифрувати канал",
-    password_placeholder: "Пароль",
     decrypt_btn: "Розшифрувати",
     wrong_password: "Невірний пароль",
     menu_tech_title: "⚙️ Технологія друку",
@@ -399,7 +468,7 @@ const translations = {
     learn_more: "How it works",
     step1: "📝 <b>Creation:</b> enter text into the red, green, and blue fields (you can fill only one or two).",
     step2: "🎨 <b>Generation:</b> the color QR code is generated automatically on the fly as you type.",
-    step2b: "🔒 <b>Encryption:</b> toggle the checkbox under any channel and enter a password — only that channel is encrypted, with its own key.",
+    step2b: "🔒 <b>Encryption:</b> tap the key icon left of a channel, enter a password (up to 12 characters) and tap the padlock — only that channel gets its own password.",
     step3: "💾 <b>Saving:</b> click 'Save PNG' to download the generated image.",
     step4: "📷 <b>Scanning:</b> click 'Scan' → point the camera at the code or pick a photo from your gallery.",
     step4b: "🔑 <b>Decryption:</b> if a channel is encrypted, a password field appears below it — enter the password and click 'Decrypt'.",
@@ -414,8 +483,6 @@ const translations = {
     btn_save: "Save PNG",
     placeholder: "Enter text...",
     encrypted_hint: "🔒 Enter the password and press 'Decrypt'",
-    encrypt_channel: "🔒 Encrypt channel",
-    password_placeholder: "Password",
     decrypt_btn: "Decrypt",
     wrong_password: "Incorrect password",
     menu_tech_title: "⚙️ Printing Tech",
@@ -693,17 +760,20 @@ async function attemptDecrypt(key) {
   els.scanTitle.textContent = translations[currentLang].scan_done;
 }
 
-function playBeep() {
+function playBeep(freq = 880, duration = 0.15) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const o = ctx.createOscillator(); const g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = 880; o.type = "sine";
+    o.frequency.value = freq; o.type = "sine";
     g.gain.setValueAtTime(0.1, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15);
-    o.start(); o.stop(ctx.currentTime + 0.15);
+    g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + duration);
+    o.start(); o.stop(ctx.currentTime + duration);
   } catch(e){}
 }
+// Тактильні звуки клавіатури пароля (запозичено з CryptoSnowQR)
+function playKeyClickSound() { playBeep(2200, 0.02); }
+function playLockSound() { playBeep(1900, 0.03); setTimeout(() => playBeep(700, 0.12), 40); }
 
 function flashScreen() {
   els.flash.classList.add('flash-anim');
@@ -814,6 +884,88 @@ function stopScanning() {
   els.video.classList.add('hidden');
 }
 
+// =====================================================================
+// КЛЮЧ / ЗАМОК НА КАНАЛІ (ключ ліворуч від тексту → 12 кружечків пароля → замок)
+// =====================================================================
+function updatePinDots(key) {
+  const passEl = els[key + 'Pass'];
+  const dotsEl = els[key + 'PinDots'];
+  if (!passEl || !dotsEl) return;
+  const len = passEl.value.length;
+  Array.from(dotsEl.children).forEach((dot, i) => dot.classList.toggle('filled', i < len));
+}
+
+function enterPasswordMode(key) {
+  const textEl = els[key];
+  const keyBtn = els[key + 'KeyBtn'];
+  const pinRow = els[key + 'PinRow'];
+  const passEl = els[key + 'Pass'];
+  passEl.value = '';
+  updatePinDots(key);
+  textEl.readOnly = true;
+  textEl.classList.add('text-masked');
+  keyBtn.classList.remove('locked');
+  keyBtn.classList.add('active');
+  keyBtn.innerHTML = KEY_ICON_SVG;
+  pinRow.classList.remove('hidden');
+  pinRow.classList.add('flex');
+  setTimeout(() => passEl.focus(), 30);
+}
+
+function exitToPlain(key, regen = true) {
+  const textEl = els[key];
+  const keyBtn = els[key + 'KeyBtn'];
+  const pinRow = els[key + 'PinRow'];
+  const passEl = els[key + 'Pass'];
+  passEl.value = '';
+  updatePinDots(key);
+  textEl.readOnly = false;
+  textEl.classList.remove('text-masked');
+  keyBtn.classList.remove('active', 'locked');
+  keyBtn.innerHTML = KEY_ICON_SVG;
+  pinRow.classList.add('hidden');
+  pinRow.classList.remove('flex');
+  if (regen) scheduleGenerateQR(0);
+}
+
+function commitLock(key) {
+  const passEl = els[key + 'Pass'];
+  const keyBtn = els[key + 'KeyBtn'];
+  const pinRow = els[key + 'PinRow'];
+  const textEl = els[key];
+  if (!passEl.value.trim()) { exitToPlain(key); return; }
+  keyBtn.classList.remove('active');
+  keyBtn.classList.add('locked');
+  keyBtn.innerHTML = LOCK_ICON_SVG;
+  pinRow.classList.add('hidden');
+  pinRow.classList.remove('flex');
+  textEl.readOnly = true;
+  textEl.classList.add('text-masked');
+  playLockSound();
+  scheduleGenerateQR(0);
+}
+
+function toggleKeyBtn(key) {
+  const keyBtn = els[key + 'KeyBtn'];
+  if (keyBtn.classList.contains('active') || keyBtn.classList.contains('locked')) {
+    exitToPlain(key);
+  } else {
+    enterPasswordMode(key);
+  }
+}
+
+function resetChannelEncryptUI(key) {
+  const textEl = els[key];
+  const keyBtn = els[key + 'KeyBtn'];
+  const pinRow = els[key + 'PinRow'];
+  const passEl = els[key + 'Pass'];
+  if (textEl) { textEl.readOnly = false; textEl.classList.remove('text-masked'); }
+  if (keyBtn) { keyBtn.classList.remove('active', 'locked'); keyBtn.innerHTML = KEY_ICON_SVG; keyBtn.disabled = true; }
+  if (pinRow) { pinRow.classList.add('hidden'); pinRow.classList.remove('flex'); }
+  if (passEl) passEl.value = '';
+  updatePinDots(key);
+}
+
 function hardReset() {
   stopScanning();
   state.locked = {r:false, g:false, b:false};
@@ -827,10 +979,7 @@ function hardReset() {
     if(els[f]) { els[f].value = ""; els[f].classList.remove('locked', 'locked-r', 'locked-g', 'locked-b'); }
   });
   resetScanDecryptUI();
-  ['r', 'g', 'b'].forEach(key => {
-    if (els[key + 'Chk']) els[key + 'Chk'].checked = false;
-    if (els[key + 'Pass']) { els[key + 'Pass'].value = ''; els[key + 'Pass'].classList.add('hidden'); }
-  });
+  ['r', 'g', 'b'].forEach(key => resetChannelEncryptUI(key));
   els.freeze.classList.add('hidden');
   els.video.classList.add('hidden');
   els.ctx.fillStyle = "#000";
@@ -840,14 +989,14 @@ function hardReset() {
   switchScreen('home');
 }
 
-// Береться живий текст каналу; якщо увімкнено шифрування й введено пароль — шифрує (SCI1:), інакше повертає як є.
+// Береться живий текст каналу; якщо ключ на каналі замкнено і введено пароль — шифрує (SCI1:), інакше повертає як є.
 async function getChannelPayload(key) {
   const textEl = els[key];
   const raw = textEl.value;
   if (!raw.trim()) return '';
-  const chk = els[key + 'Chk'];
+  const keyBtn = els[key + 'KeyBtn'];
   const passEl = els[key + 'Pass'];
-  if (chk && chk.checked && passEl && passEl.value.trim()) {
+  if (keyBtn && keyBtn.classList.contains('locked') && passEl && passEl.value.trim()) {
     try {
       return await encryptChannel(raw, passEl.value.trim());
     } catch (e) {
@@ -940,15 +1089,25 @@ document.onclick = (e) => {
 [els.r, els.g, els.b].forEach(el => el.addEventListener('input', () => scheduleGenerateQR()));
 
 ['r', 'g', 'b'].forEach(key => {
-  const chk = els[key + 'Chk'];
+  const textEl = els[key];
+  const keyBtn = els[key + 'KeyBtn'];
+  const lockBtn = els[key + 'LockBtn'];
   const pass = els[key + 'Pass'];
-  if (chk) {
-    chk.addEventListener('change', () => {
-      if (pass) pass.classList.toggle('hidden', !chk.checked);
-      scheduleGenerateQR(0);
+
+  if (textEl && keyBtn) {
+    textEl.addEventListener('input', () => {
+      keyBtn.disabled = !textEl.value.trim();
+      if (!textEl.value.trim() && (keyBtn.classList.contains('active') || keyBtn.classList.contains('locked'))) {
+        exitToPlain(key, false);
+      }
     });
   }
-  if (pass) pass.addEventListener('input', () => scheduleGenerateQR());
+  if (keyBtn) keyBtn.addEventListener('click', () => toggleKeyBtn(key));
+  if (lockBtn) lockBtn.addEventListener('click', () => commitLock(key));
+  if (pass) {
+    pass.addEventListener('input', () => { updatePinDots(key); playKeyClickSound(); });
+    pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commitLock(key); } });
+  }
 
   const decryptBtn = els[key + 'DecryptBtn'];
   const scanEl = els[key + 'Scan'];
