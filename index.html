@@ -100,44 +100,41 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
 textarea.password-mode,
 textarea.text-masked { -webkit-text-security: disc; letter-spacing: 0.15em; }
 
-/* Кнопка-ключ і кнопка-замок біля кожного каналу (стиль запозичено з CryptoSnowQR) */
+/* Кнопка-ключ і кнопка-замок біля кожного каналу (стиль запозичено з CryptoSnowQR: кругла форма, світіння, пульсація) */
 .key-btn, .lock-btn {
-  width: 44px; height: 48px; border-radius: 12px;
+  width: 46px; height: 48px; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: rgba(255,255,255,0.45);
-  transition: all 0.2s ease-in-out;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5);
+  transition: all 0.25s ease-in-out;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-.key-btn svg, .lock-btn svg { width: 18px; height: 18px; }
-.key-btn:hover, .lock-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.key-btn:disabled { opacity: 0.3; pointer-events: none; }
+.key-btn svg, .lock-btn svg { width: 19px; height: 19px; }
+.key-btn:hover, .lock-btn:hover { background: rgba(255,255,255,0.13); color: #fff; transform: scale(1.05); }
+.key-btn:active, .lock-btn:active { transform: scale(0.92); }
+.key-btn:disabled { opacity: 0.3; pointer-events: none; transform: none; }
 
-.key-btn-r.active, .key-btn-r.locked { color: var(--r-color); border-color: rgba(255,0,77,0.55); box-shadow: 0 0 12px rgba(255,0,77,0.25); }
-.key-btn-g.active, .key-btn-g.locked { color: var(--g-color); border-color: rgba(0,255,65,0.55); box-shadow: 0 0 12px rgba(0,255,65,0.25); }
-.key-btn-b.active, .key-btn-b.locked { color: var(--b-color); border-color: rgba(0,136,255,0.55); box-shadow: 0 0 12px rgba(0,136,255,0.25); }
-.key-btn-r.locked { background: rgba(255,0,77,0.15); }
-.key-btn-g.locked { background: rgba(0,255,65,0.15); }
-.key-btn-b.locked { background: rgba(0,136,255,0.15); }
-
-.lock-btn-r:hover { color: var(--r-color); border-color: rgba(255,0,77,0.55); }
-.lock-btn-g:hover { color: var(--g-color); border-color: rgba(0,255,65,0.55); }
-.lock-btn-b:hover { color: var(--b-color); border-color: rgba(0,136,255,0.55); }
-
-/* Дванадцять кружечків пароля — заповнюються по мірі введення символів */
-.pin-row { min-height: 48px; }
-.pin-dots { display: flex; flex-wrap: wrap; gap: 6px; max-width: 210px; align-content: center; }
-.pin-dot {
-  width: 12px; height: 12px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.25);
-  background: transparent;
-  transition: all 0.15s ease;
+@keyframes key-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--glow-color); }
+  50% { box-shadow: 0 0 18px var(--glow-color); }
 }
-.pin-dot-r.filled { background: var(--r-color); border-color: var(--r-color); box-shadow: 0 0 6px rgba(255,0,77,0.65); }
-.pin-dot-g.filled { background: var(--g-color); border-color: var(--g-color); box-shadow: 0 0 6px rgba(0,255,65,0.65); }
-.pin-dot-b.filled { background: var(--b-color); border-color: var(--b-color); box-shadow: 0 0 6px rgba(0,136,255,0.65); }
-.pin-hidden-input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+
+.key-btn-r.active { color: var(--r-color); border-color: var(--r-color); background: rgba(255,0,77,0.14); --glow-color: rgba(255,0,77,0.55); animation: key-pulse 1.4s ease-in-out infinite; }
+.key-btn-g.active { color: var(--g-color); border-color: var(--g-color); background: rgba(0,255,65,0.14); --glow-color: rgba(0,255,65,0.55); animation: key-pulse 1.4s ease-in-out infinite; }
+.key-btn-b.active { color: var(--b-color); border-color: var(--b-color); background: rgba(0,136,255,0.14); --glow-color: rgba(0,136,255,0.55); animation: key-pulse 1.4s ease-in-out infinite; }
+
+.key-btn-r.locked { color: #fff; background: var(--r-color); border-color: var(--r-color); box-shadow: 0 0 14px rgba(255,0,77,0.5); }
+.key-btn-g.locked { color: #04140a; background: var(--g-color); border-color: var(--g-color); box-shadow: 0 0 14px rgba(0,255,65,0.5); }
+.key-btn-b.locked { color: #fff; background: var(--b-color); border-color: var(--b-color); box-shadow: 0 0 14px rgba(0,136,255,0.5); }
+
+.lock-btn-r { color: var(--r-color); border-color: rgba(255,0,77,0.5); background: rgba(255,0,77,0.08); }
+.lock-btn-g { color: var(--g-color); border-color: rgba(0,255,65,0.5); background: rgba(0,255,65,0.08); }
+.lock-btn-b { color: var(--b-color); border-color: rgba(0,136,255,0.5); background: rgba(0,136,255,0.08); }
+.lock-btn-r:hover { border-color: var(--r-color); box-shadow: 0 0 16px rgba(255,0,77,0.45); }
+.lock-btn-g:hover { border-color: var(--g-color); box-shadow: 0 0 16px rgba(0,255,65,0.45); }
+.lock-btn-b:hover { border-color: var(--b-color); box-shadow: 0 0 16px rgba(0,136,255,0.45); }
 </style>
 </head>
 <body class="p-4 pb-6">
@@ -187,11 +184,7 @@ textarea.text-masked { -webkit-text-security: disc; letter-spacing: 0.15em; }
       <div class="flex items-stretch gap-2 pl-4">
         <button type="button" id="r-key-btn" class="key-btn key-btn-r shrink-0" disabled aria-label="key"></button>
         <textarea id="r-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      </div>
-      <div id="r-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
-        <div id="r-pin-dots" class="pin-dots"></div>
-        <input type="password" id="r-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
-        <button type="button" id="r-lock-btn" class="lock-btn lock-btn-r shrink-0" aria-label="confirm"></button>
+        <button type="button" id="r-lock-btn" class="lock-btn lock-btn-r shrink-0 hidden" aria-label="confirm"></button>
       </div>
     </div>
     <div class="relative">
@@ -199,11 +192,7 @@ textarea.text-masked { -webkit-text-security: disc; letter-spacing: 0.15em; }
       <div class="flex items-stretch gap-2 pl-4">
         <button type="button" id="g-key-btn" class="key-btn key-btn-g shrink-0" disabled aria-label="key"></button>
         <textarea id="g-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      </div>
-      <div id="g-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
-        <div id="g-pin-dots" class="pin-dots"></div>
-        <input type="password" id="g-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
-        <button type="button" id="g-lock-btn" class="lock-btn lock-btn-g shrink-0" aria-label="confirm"></button>
+        <button type="button" id="g-lock-btn" class="lock-btn lock-btn-g shrink-0 hidden" aria-label="confirm"></button>
       </div>
     </div>
     <div class="relative">
@@ -211,11 +200,7 @@ textarea.text-masked { -webkit-text-security: disc; letter-spacing: 0.15em; }
       <div class="flex items-stretch gap-2 pl-4">
         <button type="button" id="b-key-btn" class="key-btn key-btn-b shrink-0" disabled aria-label="key"></button>
         <textarea id="b-text" class="flex-1 min-w-0 p-3 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..."></textarea>
-      </div>
-      <div id="b-pin-row" class="pin-row hidden items-center gap-3 mt-2 pl-4">
-        <div id="b-pin-dots" class="pin-dots"></div>
-        <input type="password" id="b-pass" maxlength="12" autocomplete="off" class="pin-hidden-input" aria-label="password">
-        <button type="button" id="b-lock-btn" class="lock-btn lock-btn-b shrink-0" aria-label="confirm"></button>
+        <button type="button" id="b-lock-btn" class="lock-btn lock-btn-b shrink-0 hidden" aria-label="confirm"></button>
       </div>
     </div>
   </div>
@@ -362,21 +347,12 @@ const els = {
   rScan: document.getElementById('r-text-scan'),
   gScan: document.getElementById('g-text-scan'),
   bScan: document.getElementById('b-text-scan'),
-  rPass: document.getElementById('r-pass'),
-  gPass: document.getElementById('g-pass'),
-  bPass: document.getElementById('b-pass'),
   rKeyBtn: document.getElementById('r-key-btn'),
   gKeyBtn: document.getElementById('g-key-btn'),
   bKeyBtn: document.getElementById('b-key-btn'),
   rLockBtn: document.getElementById('r-lock-btn'),
   gLockBtn: document.getElementById('g-lock-btn'),
   bLockBtn: document.getElementById('b-lock-btn'),
-  rPinRow: document.getElementById('r-pin-row'),
-  gPinRow: document.getElementById('g-pin-row'),
-  bPinRow: document.getElementById('b-pin-row'),
-  rPinDots: document.getElementById('r-pin-dots'),
-  gPinDots: document.getElementById('g-pin-dots'),
-  bPinDots: document.getElementById('b-pin-dots'),
   rDecryptBtn: document.getElementById('r-decrypt-btn'),
   gDecryptBtn: document.getElementById('g-decrypt-btn'),
   bDecryptBtn: document.getElementById('b-decrypt-btn'),
@@ -416,21 +392,17 @@ els.viewfinder.innerHTML = `<div class="corner tl"></div><div class="corner tr">
 const KEY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10.5 11.5 20 2m0 0h-5m5 0v5m-9 4.5L15 9"/></svg>`;
 const LOCK_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`;
 
-// 12 порожніх кружечків пароля на кожен канал
 ['r', 'g', 'b'].forEach(key => {
-  const dotsEl = els[key + 'PinDots'];
   const keyBtn = els[key + 'KeyBtn'];
   if (keyBtn) keyBtn.innerHTML = KEY_ICON_SVG;
   const lockBtn = els[key + 'LockBtn'];
   if (lockBtn) lockBtn.innerHTML = LOCK_ICON_SVG;
-  if (dotsEl) {
-    for (let i = 0; i < 12; i++) {
-      const dot = document.createElement('span');
-      dot.className = 'pin-dot pin-dot-' + key;
-      dotsEl.appendChild(dot);
-    }
-  }
 });
+
+// Пароль каналу вводиться прямо в те саме текстове поле (замасковане),
+// тож справжній текст каналу на час введення пароля зберігається тут.
+const channelPlainText = { r: '', g: '', b: '' };
+const channelEncPass = { r: '', g: '', b: '' };
 
 // === 2. TRANSLATIONS ===
 const translations = {
@@ -456,6 +428,7 @@ const translations = {
     btn_save: "Зберегти PNG",
     placeholder: "Введіть текст...",
     encrypted_hint: "🔒 Введіть пароль і натисніть «Розшифрувати»",
+    key_placeholder: "ключ",
     decrypt_btn: "Розшифрувати",
     wrong_password: "Невірний пароль",
     menu_tech_title: "⚙️ Технологія друку",
@@ -483,6 +456,7 @@ const translations = {
     btn_save: "Save PNG",
     placeholder: "Enter text...",
     encrypted_hint: "🔒 Enter the password and press 'Decrypt'",
+    key_placeholder: "key",
     decrypt_btn: "Decrypt",
     wrong_password: "Incorrect password",
     menu_tech_title: "⚙️ Printing Tech",
@@ -510,7 +484,12 @@ function setLanguage(lang) {
   document.getElementById('step-4b').innerHTML = dict.step4b;
 
   ['r', 'g', 'b'].forEach(key => {
-    if (els[key]) els[key].placeholder = dict.placeholder;
+    const textEl = els[key];
+    const keyBtn = els[key + 'KeyBtn'];
+    if (textEl) {
+      const isEnteringPass = keyBtn && keyBtn.classList.contains('active');
+      textEl.placeholder = isEnteringPass ? dict.key_placeholder : dict.placeholder;
+    }
     const scanEl = els[key + 'Scan'];
     const wrap = els[key + 'DecryptWrap'];
     if (scanEl) {
@@ -885,62 +864,61 @@ function stopScanning() {
 }
 
 // =====================================================================
-// КЛЮЧ / ЗАМОК НА КАНАЛІ (ключ ліворуч від тексту → 12 кружечків пароля → замок)
+// КЛЮЧ / ЗАМОК НА КАНАЛІ
+// Ключ ліворуч від поля: клік ховає введений текст і перетворює те саме
+// поле на введення пароля (курсор одразу там, плейсхолдер «ключ»,
+// символи маскуються крапками, до 12). Клік на замочок праворуч —
+// підтверджує пароль, канал зашифровано, текст повертається замаскованим.
 // =====================================================================
-function updatePinDots(key) {
-  const passEl = els[key + 'Pass'];
-  const dotsEl = els[key + 'PinDots'];
-  if (!passEl || !dotsEl) return;
-  const len = passEl.value.length;
-  Array.from(dotsEl.children).forEach((dot, i) => dot.classList.toggle('filled', i < len));
-}
-
 function enterPasswordMode(key) {
   const textEl = els[key];
   const keyBtn = els[key + 'KeyBtn'];
-  const pinRow = els[key + 'PinRow'];
-  const passEl = els[key + 'Pass'];
-  passEl.value = '';
-  updatePinDots(key);
-  textEl.readOnly = true;
+  const lockBtn = els[key + 'LockBtn'];
+  channelPlainText[key] = textEl.value;
+  textEl.value = '';
+  textEl.readOnly = false;
+  textEl.maxLength = 12;
   textEl.classList.add('text-masked');
+  textEl.placeholder = translations[currentLang].key_placeholder;
   keyBtn.classList.remove('locked');
   keyBtn.classList.add('active');
   keyBtn.innerHTML = KEY_ICON_SVG;
-  pinRow.classList.remove('hidden');
-  pinRow.classList.add('flex');
-  setTimeout(() => passEl.focus(), 30);
+  lockBtn.classList.remove('hidden');
+  setTimeout(() => textEl.focus(), 30);
 }
 
 function exitToPlain(key, regen = true) {
   const textEl = els[key];
   const keyBtn = els[key + 'KeyBtn'];
-  const pinRow = els[key + 'PinRow'];
-  const passEl = els[key + 'Pass'];
-  passEl.value = '';
-  updatePinDots(key);
+  const lockBtn = els[key + 'LockBtn'];
+  textEl.value = channelPlainText[key] || '';
   textEl.readOnly = false;
+  textEl.removeAttribute('maxlength');
   textEl.classList.remove('text-masked');
+  textEl.placeholder = translations[currentLang].placeholder;
   keyBtn.classList.remove('active', 'locked');
   keyBtn.innerHTML = KEY_ICON_SVG;
-  pinRow.classList.add('hidden');
-  pinRow.classList.remove('flex');
+  lockBtn.classList.add('hidden');
+  channelPlainText[key] = '';
+  channelEncPass[key] = '';
   if (regen) scheduleGenerateQR(0);
 }
 
 function commitLock(key) {
-  const passEl = els[key + 'Pass'];
-  const keyBtn = els[key + 'KeyBtn'];
-  const pinRow = els[key + 'PinRow'];
   const textEl = els[key];
-  if (!passEl.value.trim()) { exitToPlain(key); return; }
+  const keyBtn = els[key + 'KeyBtn'];
+  const lockBtn = els[key + 'LockBtn'];
+  const pwd = textEl.value.trim();
+  if (!pwd) { exitToPlain(key); return; }
+  channelEncPass[key] = pwd;
+  textEl.value = channelPlainText[key];
+  textEl.readOnly = true;
+  textEl.removeAttribute('maxlength');
+  textEl.classList.add('text-masked');
   keyBtn.classList.remove('active');
   keyBtn.classList.add('locked');
   keyBtn.innerHTML = LOCK_ICON_SVG;
-  pinRow.classList.add('hidden');
-  pinRow.classList.remove('flex');
-  textEl.readOnly = true;
-  textEl.classList.add('text-masked');
+  lockBtn.classList.add('hidden');
   playLockSound();
   scheduleGenerateQR(0);
 }
@@ -957,13 +935,12 @@ function toggleKeyBtn(key) {
 function resetChannelEncryptUI(key) {
   const textEl = els[key];
   const keyBtn = els[key + 'KeyBtn'];
-  const pinRow = els[key + 'PinRow'];
-  const passEl = els[key + 'Pass'];
-  if (textEl) { textEl.readOnly = false; textEl.classList.remove('text-masked'); }
+  const lockBtn = els[key + 'LockBtn'];
+  if (textEl) { textEl.readOnly = false; textEl.classList.remove('text-masked'); textEl.removeAttribute('maxlength'); textEl.placeholder = translations[currentLang].placeholder; }
   if (keyBtn) { keyBtn.classList.remove('active', 'locked'); keyBtn.innerHTML = KEY_ICON_SVG; keyBtn.disabled = true; }
-  if (pinRow) { pinRow.classList.add('hidden'); pinRow.classList.remove('flex'); }
-  if (passEl) passEl.value = '';
-  updatePinDots(key);
+  if (lockBtn) lockBtn.classList.add('hidden');
+  channelPlainText[key] = '';
+  channelEncPass[key] = '';
 }
 
 function hardReset() {
@@ -992,13 +969,15 @@ function hardReset() {
 // Береться живий текст каналу; якщо ключ на каналі замкнено і введено пароль — шифрує (SCI1:), інакше повертає як є.
 async function getChannelPayload(key) {
   const textEl = els[key];
-  const raw = textEl.value;
-  if (!raw.trim()) return '';
   const keyBtn = els[key + 'KeyBtn'];
-  const passEl = els[key + 'Pass'];
-  if (keyBtn && keyBtn.classList.contains('locked') && passEl && passEl.value.trim()) {
+  const isEncryptMode = keyBtn.classList.contains('active') || keyBtn.classList.contains('locked');
+  // Поки триває введення/підтвердження пароля, справжній текст каналу
+  // лежить окремо (у полі зараз пароль, а не текст).
+  const raw = isEncryptMode ? channelPlainText[key] : textEl.value;
+  if (!raw || !raw.trim()) return '';
+  if (keyBtn.classList.contains('locked') && channelEncPass[key]) {
     try {
-      return await encryptChannel(raw, passEl.value.trim());
+      return await encryptChannel(raw, channelEncPass[key]);
     } catch (e) {
       return raw;
     }
@@ -1092,22 +1071,26 @@ document.onclick = (e) => {
   const textEl = els[key];
   const keyBtn = els[key + 'KeyBtn'];
   const lockBtn = els[key + 'LockBtn'];
-  const pass = els[key + 'Pass'];
 
   if (textEl && keyBtn) {
     textEl.addEventListener('input', () => {
+      const isEncryptMode = keyBtn.classList.contains('active') || keyBtn.classList.contains('locked');
+      if (isEncryptMode) {
+        // Поле зараз містить пароль, що вводиться, а не текст каналу
+        playKeyClickSound();
+        return;
+      }
       keyBtn.disabled = !textEl.value.trim();
-      if (!textEl.value.trim() && (keyBtn.classList.contains('active') || keyBtn.classList.contains('locked'))) {
-        exitToPlain(key, false);
+    });
+    textEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && keyBtn.classList.contains('active')) {
+        e.preventDefault();
+        commitLock(key);
       }
     });
   }
   if (keyBtn) keyBtn.addEventListener('click', () => toggleKeyBtn(key));
   if (lockBtn) lockBtn.addEventListener('click', () => commitLock(key));
-  if (pass) {
-    pass.addEventListener('input', () => { updatePinDots(key); playKeyClickSound(); });
-    pass.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); commitLock(key); } });
-  }
 
   const decryptBtn = els[key + 'DecryptBtn'];
   const scanEl = els[key + 'Scan'];
