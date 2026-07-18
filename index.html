@@ -654,14 +654,12 @@ function allChannelsReadyToFinish() {
   });
 }
 
+// Сканування лише зупиняється (заморожує картинку) — без автопереходу на
+// екран «Створення», щоб щойно розшифрований текст не зникав з очей.
 function maybeFinishScan() {
   if (!allChannelsReadyToFinish()) return;
   els.scanTitle.textContent = translations[currentLang].scan_done;
-  setTimeout(() => {
-    stopScanning();
-    switchScreen('create');
-    generateQR();
-  }, 500);
+  stopScanning();
 }
 
 async function attemptDecrypt(key) {
@@ -682,14 +680,17 @@ async function attemptDecrypt(key) {
     inputScan.focus();
     return;
   }
-  // Правильний пароль — на місці ключа з'являється розшифрований текст
+  // Правильний пароль — на місці ключа з'являється розшифрований текст.
+  // Одразу зупиняємо сканування/камеру, щоб картинка більше не змінювалась
+  // і не заважала прочитати щойно розшифрований текст.
   inputScan.value = plain;
   inputScan.readOnly = true;
   inputScan.classList.remove('password-mode');
   inputScan.placeholder = translations[currentLang].placeholder;
   const wrap = els[key + 'DecryptWrap'];
   if (wrap) wrap.classList.add('hidden');
-  maybeFinishScan();
+  stopScanning();
+  els.scanTitle.textContent = translations[currentLang].scan_done;
 }
 
 function playBeep() {
