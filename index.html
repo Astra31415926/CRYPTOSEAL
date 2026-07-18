@@ -98,6 +98,7 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
 .dropdown-menu.show { transform: translateY(0); opacity: 1; visibility: visible; }
 .pass-field { transition: all 0.2s ease; }
 .channel-lock-row { min-height: 22px; }
+textarea.password-mode { -webkit-text-security: disc; letter-spacing: 0.15em; }
 </style>
 </head>
 <body class="p-4 pb-6">
@@ -200,8 +201,7 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-600 rounded-full"></div>
       <textarea id="r-text-scan" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..." readonly></textarea>
-      <div id="r-decrypt-wrap" class="hidden channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <input type="password" id="r-pass-scan" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-red-600/40 text-xs outline-none focus:border-red-600/70">
+      <div id="r-decrypt-wrap" class="hidden channel-lock-row flex justify-end mt-1.5 pl-4">
         <button id="r-decrypt-btn" data-i18n="decrypt_btn" class="shrink-0 px-3 py-1 rounded-lg bg-red-600/20 border border-red-600/50 text-red-400 text-[11px] font-bold uppercase tracking-wide active:scale-95">Розшифрувати</button>
       </div>
       <p id="r-decrypt-err" class="hidden text-[11px] text-red-500 mt-1 pl-4" data-i18n="wrong_password">Невірний пароль</p>
@@ -209,8 +209,7 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-600 rounded-full"></div>
       <textarea id="g-text-scan" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..." readonly></textarea>
-      <div id="g-decrypt-wrap" class="hidden channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <input type="password" id="g-pass-scan" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-green-600/40 text-xs outline-none focus:border-green-600/70">
+      <div id="g-decrypt-wrap" class="hidden channel-lock-row flex justify-end mt-1.5 pl-4">
         <button id="g-decrypt-btn" data-i18n="decrypt_btn" class="shrink-0 px-3 py-1 rounded-lg bg-green-600/20 border border-green-600/50 text-green-400 text-[11px] font-bold uppercase tracking-wide active:scale-95">Розшифрувати</button>
       </div>
       <p id="g-decrypt-err" class="hidden text-[11px] text-red-500 mt-1 pl-4" data-i18n="wrong_password">Невірний пароль</p>
@@ -218,8 +217,7 @@ textarea.locked-b { border-color: var(--b-color); box-shadow: 0 0 15px rgba(0,13
     <div class="relative">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-full"></div>
       <textarea id="b-text-scan" class="w-full p-3 pl-4 rounded-xl outline-none h-12 text-sm font-medium" placeholder="Введіть текст..." readonly></textarea>
-      <div id="b-decrypt-wrap" class="hidden channel-lock-row flex items-center gap-2 mt-1.5 pl-4">
-        <input type="password" id="b-pass-scan" data-i18n-placeholder="password_placeholder" placeholder="Пароль" autocomplete="off" class="pass-field flex-1 min-w-0 px-2 py-1 rounded-lg bg-black/40 border border-blue-600/40 text-xs outline-none focus:border-blue-600/70">
+      <div id="b-decrypt-wrap" class="hidden channel-lock-row flex justify-end mt-1.5 pl-4">
         <button id="b-decrypt-btn" data-i18n="decrypt_btn" class="shrink-0 px-3 py-1 rounded-lg bg-blue-600/20 border border-blue-600/50 text-blue-400 text-[11px] font-bold uppercase tracking-wide active:scale-95">Розшифрувати</button>
       </div>
       <p id="b-decrypt-err" class="hidden text-[11px] text-red-500 mt-1 pl-4" data-i18n="wrong_password">Невірний пароль</p>
@@ -328,9 +326,6 @@ const els = {
   rPass: document.getElementById('r-pass'),
   gPass: document.getElementById('g-pass'),
   bPass: document.getElementById('b-pass'),
-  rPassScan: document.getElementById('r-pass-scan'),
-  gPassScan: document.getElementById('g-pass-scan'),
-  bPassScan: document.getElementById('b-pass-scan'),
   rDecryptBtn: document.getElementById('r-decrypt-btn'),
   gDecryptBtn: document.getElementById('g-decrypt-btn'),
   bDecryptBtn: document.getElementById('b-decrypt-btn'),
@@ -389,7 +384,7 @@ const translations = {
     btn_gallery: "🖼️ Галерея",
     btn_save: "Зберегти PNG",
     placeholder: "Введіть текст...",
-    encrypted_hint: "🔒 Зашифровано — введіть пароль нижче",
+    encrypted_hint: "🔒 Введіть пароль і натисніть «Розшифрувати»",
     encrypt_channel: "🔒 Зашифрувати канал",
     password_placeholder: "Пароль",
     decrypt_btn: "Розшифрувати",
@@ -418,7 +413,7 @@ const translations = {
     btn_gallery: "🖼️ Gallery",
     btn_save: "Save PNG",
     placeholder: "Enter text...",
-    encrypted_hint: "🔒 Encrypted — enter password below",
+    encrypted_hint: "🔒 Enter the password and press 'Decrypt'",
     encrypt_channel: "🔒 Encrypt channel",
     password_placeholder: "Password",
     decrypt_btn: "Decrypt",
@@ -635,32 +630,47 @@ function lockChannel(ch, data) {
   if (inputScan) {
     inputScan.classList.add('locked', 'locked-'+key);
     if (isEncrypted) {
+      // Не показуємо шифротекст: те саме поле одразу стає полем для введення пароля
       inputScan.value = '';
+      inputScan.readOnly = false;
+      inputScan.classList.add('password-mode');
       inputScan.placeholder = translations[currentLang].encrypted_hint;
       const wrap = els[key + 'DecryptWrap'];
       if (wrap) wrap.classList.remove('hidden');
+      setTimeout(() => inputScan.focus(), 50);
     } else {
       inputScan.value = data;
     }
   }
 
-  if (state.locked.r && state.locked.g && state.locked.b) {
-    els.scanTitle.textContent = translations[currentLang].scan_done;
-    setTimeout(() => {
-      stopScanning();
-      switchScreen('create');
-      generateQR();
-    }, 500);
-  }
+  maybeFinishScan();
+}
+
+function allChannelsReadyToFinish() {
+  if (!(state.locked.r && state.locked.g && state.locked.b)) return false;
+  return !['r', 'g', 'b'].some(k => {
+    const wrap = els[k + 'DecryptWrap'];
+    return wrap && !wrap.classList.contains('hidden');
+  });
+}
+
+function maybeFinishScan() {
+  if (!allChannelsReadyToFinish()) return;
+  els.scanTitle.textContent = translations[currentLang].scan_done;
+  setTimeout(() => {
+    stopScanning();
+    switchScreen('create');
+    generateQR();
+  }, 500);
 }
 
 async function attemptDecrypt(key) {
-  const passEl = els[key + 'PassScan'];
+  const inputScan = els[key + 'Scan'];
   const errEl = els[key + 'DecryptErr'];
   const btnEl = els[key + 'DecryptBtn'];
   const raw = state.results[key];
-  if (!raw || !passEl) return;
-  const pwd = passEl.value.trim();
+  if (!raw || !inputScan) return;
+  const pwd = inputScan.value.trim();
   if (!pwd) return;
   errEl.classList.add('hidden');
   if (btnEl) btnEl.disabled = true;
@@ -668,15 +678,18 @@ async function attemptDecrypt(key) {
   if (btnEl) btnEl.disabled = false;
   if (plain === null) {
     errEl.classList.remove('hidden');
+    inputScan.value = '';
+    inputScan.focus();
     return;
   }
-  const inputScan = els[key + 'Scan'];
-  if (inputScan) {
-    inputScan.value = plain;
-    inputScan.placeholder = translations[currentLang].placeholder;
-  }
+  // Правильний пароль — на місці ключа з'являється розшифрований текст
+  inputScan.value = plain;
+  inputScan.readOnly = true;
+  inputScan.classList.remove('password-mode');
+  inputScan.placeholder = translations[currentLang].placeholder;
   const wrap = els[key + 'DecryptWrap'];
   if (wrap) wrap.classList.add('hidden');
+  maybeFinishScan();
 }
 
 function playBeep() {
@@ -716,10 +729,14 @@ function switchScreen(screenName) {
 
 function resetScanDecryptUI() {
   ['r', 'g', 'b'].forEach(key => {
-    if (els[key + 'PassScan']) els[key + 'PassScan'].value = '';
+    const scanEl = els[key + 'Scan'];
+    if (scanEl) {
+      scanEl.readOnly = true;
+      scanEl.classList.remove('password-mode');
+      scanEl.placeholder = translations[currentLang].placeholder;
+    }
     if (els[key + 'DecryptWrap']) els[key + 'DecryptWrap'].classList.add('hidden');
     if (els[key + 'DecryptErr']) els[key + 'DecryptErr'].classList.add('hidden');
-    if (els[key + 'Scan']) els[key + 'Scan'].placeholder = translations[currentLang].placeholder;
   });
 }
 
@@ -933,9 +950,11 @@ document.onclick = (e) => {
   if (pass) pass.addEventListener('input', () => scheduleGenerateQR());
 
   const decryptBtn = els[key + 'DecryptBtn'];
-  const passScan = els[key + 'PassScan'];
+  const scanEl = els[key + 'Scan'];
   if (decryptBtn) decryptBtn.addEventListener('click', () => attemptDecrypt(key));
-  if (passScan) passScan.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptDecrypt(key); });
+  if (scanEl) scanEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !scanEl.readOnly) { e.preventDefault(); attemptDecrypt(key); }
+  });
 });
 
 window.addEventListener('DOMContentLoaded', () => {
